@@ -1,10 +1,25 @@
 version: '3.8'
 
 services:
-  web:
+  holaflask:
     build: .
-    ports:
-      - "5000:5000"
-    environment:
-      - FLASK_ENV=production
-    restart: unless-stopped
+    container_name: holaflask
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.holaflask.entrypoints=http"
+      - "traefik.http.routers.holaflask.rule=Host(`holaflask.byronrm.com`)"
+      - "traefik.http.middlewares.holaflask-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.holaflask.middlewares=holaflask-https-redirect"
+      - "traefik.http.routers.holaflask-secure.entrypoints=https"
+      - "traefik.http.routers.holaflask-secure.rule=Host(`holaflask.byronrm.com`)"
+      - "traefik.http.routers.holaflask-secure.tls=true"
+      - "traefik.http.routers.holaflask-secure.tls.certresolver=http"
+      - "traefik.http.routers.holaflask-secure.service=holaflask"
+      - "traefik.http.services.holaflask.loadbalancer.server.port=5000"
+      - "traefik.docker.network=traefik-public"
+    networks:
+      - traefik-public
+
+networks:
+  traefik-public:
+    external: true

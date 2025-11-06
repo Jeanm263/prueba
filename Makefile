@@ -1,33 +1,25 @@
-STACK_NAME=db_stack
+# Variables
+SERVICE_NAME=holaflask
 
-.PHONY: help
-help:
-	@echo "Please use 'make <target>' where <target> is one of"
-	@echo "  deploy      to deploy the stack"
-	@echo "  ps          to show stack services"
-	@echo "  logs        to view postgres service logs"
-	@echo "  rm          to remove the stack"
-	@echo "  networks    to list networks"
-	@echo "  volumes     to list volumes"
-	@echo "  build       to build the Flask app image"
-
+# Construir la imagen
 build:
-	docker build -t flask-app:latest .
+	docker compose build
 
-deploy:
-	docker stack deploy -c stack.yml $(STACK_NAME)
+# Levantar el servicio
+up:
+	docker compose up -d
 
-ps:
-	docker stack ps $(STACK_NAME)
-
+# Ver logs del servicio
 logs:
-	docker service logs $(STACK_NAME)_postgres -f
+	docker compose logs -f $(SERVICE_NAME)
 
-rm:
-	docker stack rm $(STACK_NAME)
+# Detener los contenedores
+down:
+	docker compose down
 
-networks:
-	docker network ls
+# Reconstruir completamente el servicio
+rebuild: down build up
 
-volumes:
-	docker volume ls
+# Limpiar imágenes huérfanas
+clean:
+	docker system prune -f

@@ -1,17 +1,17 @@
-# Imagen base de Python
-FROM python:3.10-slim
+# Imagen base oficial de Python
+FROM python:3.11-slim
 
-# Directorio de trabajo dentro del contenedor
+# Establecer directorio de trabajo
 WORKDIR /app
 
-# Copiamos los archivos del proyecto
-COPY . .
+# Copiar dependencias y código
+COPY app.py /app
 
-# Instalamos las dependencias directamente
-RUN pip install --no-cache-dir Flask
+# Instalar Flask
+RUN pip install --no-cache-dir flask
 
-# Exponemos el puerto 5000
+# Exponer el puerto donde corre Flask
 EXPOSE 5000
 
-# Comando que ejecuta la app
+# Comando por defecto
 CMD ["python", "app.py"]
