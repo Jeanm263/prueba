@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    return "¡Hola Mundo desde Flask con Traefik! 🚀"
+    return "¡Hola Mundo desde Flask con CI/CD Automatizado! 🚀"
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
