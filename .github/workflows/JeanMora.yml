@@ -67,6 +67,13 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: 🏷️ Prepare Docker metadata
+      if: github.event_name == 'push' || github.event_name == 'release'
+      id: meta
+      run: |
+        echo "REPO_LOWER=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+        echo "SHA_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
     - name: 🚀 Build and push Docker image
       if: github.event_name == 'push' || github.event_name == 'release'
       uses: docker/build-push-action@v6
@@ -75,7 +82,7 @@ jobs:
         platforms: linux/amd64,linux/arm64
         push: true
         tags: |
-          ghcr.io/${{ toLower(github.repository) }}:latest
-          ghcr.io/${{ toLower(github.repository) }}:${{ github.sha }}
+          ghcr.io/${{ env.REPO_LOWER }}:latest
+          ghcr.io/${{ env.REPO_LOWER }}:${{ github.sha }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
