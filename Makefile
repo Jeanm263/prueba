@@ -5,13 +5,17 @@ SERVICE_NAME=holaflask
 build:
 	docker compose build
 
-# Levantar el servicio
+# Levantar todos los servicios
 up:
 	docker compose up -d
 
-# Ver logs del servicio
+# Ver logs del servicio Flask
 logs:
 	docker compose logs -f $(SERVICE_NAME)
+
+# Ver logs de Traefik
+traefik-logs:
+	docker compose logs -f traefik
 
 # Detener los contenedores
 down:
@@ -23,3 +27,7 @@ rebuild: down build up
 # Limpiar imágenes huérfanas
 clean:
 	docker system prune -f
+
+# Ver el dashboard de Traefik
+dashboard:
+	echo "Abre tu navegador en http://localhost:8080"
