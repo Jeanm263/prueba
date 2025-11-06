@@ -1,5 +1,7 @@
 # Variables
 SERVICE_NAME=holaflask
+IMAGE_NAME=holaflask
+REGISTRY=ghcr.io
 
 # Construir la imagen
 build:
@@ -31,3 +33,11 @@ clean:
 # Ver el dashboard de Traefik
 dashboard:
 	echo "Abre tu navegador en http://localhost:8080"
+
+# Construir imagen para múltiples plataformas
+build-multi:
+	docker buildx build --platform linux/amd64,linux/arm64 -t $(IMAGE_NAME) -f Dockerfile.multi .
+
+# Publicar en GitHub Packages
+publish:
+	docker buildx build --platform linux/amd64,linux/arm64 -t $(REGISTRY)/$(IMAGE_NAME):latest -f Dockerfile.multi . --push

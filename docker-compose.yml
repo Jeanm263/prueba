@@ -20,7 +20,9 @@ services:
       - traefik-public
 
   holaflask:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile.multi
     container_name: holaflask
     labels:
       - "traefik.enable=true"
