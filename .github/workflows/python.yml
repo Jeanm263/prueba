@@ -48,20 +48,33 @@ jobs:
         docker rm -f test-holaflask
     - name: Log in to GitHub Container Registry
       if: github.event_name == 'release'
-      run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-    - name: Push to GitHub Packages
+      run: |
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+    - name: Build and push to GitHub Packages
       if: github.event_name == 'release'
       run: |
+        # Set up Docker Buildx
+        docker buildx create --name mybuilder --use
+        docker buildx inspect --bootstrap
+        
+        # Build and push
         IMAGE_ID=ghcr.io/${{ github.repository_owner }}/holaflask
         # Change all uppercase to lowercase
         IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-        # Strip git ref prefix from version
-        VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-        # Strip "v" prefix from tag name
-        [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-        # Use Docker `latest` tag convention
-        [ "$VERSION" == "main" ] && VERSION=latest
-        echo IMAGE_ID=$IMAGE_ID
-        echo VERSION=$VERSION
-        docker tag holaflask $IMAGE_ID:$VERSION
-        docker push $IMAGE_ID:$VERSION
+        
+        # Get version from tag or use latest
+        if [ "${{ github.event.release.tag_name }}" != "" ]; then
+          VERSION=${{ github.event.release.tag_name }}
+          # Strip "v" prefix from tag name
+          VERSION=$(echo $VERSION | sed -e 's/^v//')
+        else
+          VERSION=latest
+        fi
+        
+        echo "Building and pushing $IMAGE_ID:$VERSION"
+        
+        # Build and push
+        docker buildx build --platform linux/amd64,linux/arm64 \
+          -t $IMAGE_ID:$VERSION \
+          -t $IMAGE_ID:latest \
+          --push .
