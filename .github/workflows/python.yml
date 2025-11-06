@@ -67,7 +67,14 @@ jobs:
           VERSION=${{ github.event.release.tag_name }}
           # Strip "v" prefix from tag name
           VERSION=$(echo $VERSION | sed -e 's/^v//')
+          # Ensure version doesn't start with a dot
+          VERSION=$(echo $VERSION | sed -e 's/^\.//')
         else
+          VERSION=latest
+        fi
+        
+        # If version is empty or just dots, use latest
+        if [ -z "$VERSION" ] || [ "$VERSION" = "." ]; then
           VERSION=latest
         fi
         
